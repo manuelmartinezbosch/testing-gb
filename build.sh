@@ -32,7 +32,7 @@ rgblink -d                      `# DMG mode` \
 rgbfix -j                   `# non-japanese version` \
        -v                   `# validate ROM (checksums and Nintendo Logo)` \
        -n 0                 `# game version number` \
-       -k 01                `# new license code` \
+       -k 11                `# new license code` \
        -l 0x33              `# old license code. Should be 0x33 when used new license code for SGB compatibility` \
        -m 0                 `# MBC controller type` \
        -r 0                 `# RAM size` \
