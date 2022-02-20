@@ -7,9 +7,9 @@ INCLUDE "home/header.asm"
 
 ; TODO pending to use high home
 
-; SECTION "High Home" ROM0
+SECTION "High Home", ROM0
 
-; INCLUDE "home/lcd.asm"
+INCLUDE "home/lcd.asm"
 ; INCLUDE "home/clear_sprites.asm"
 ; INCLUDE "home/copy.asm"
 
