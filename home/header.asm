@@ -50,7 +50,7 @@ SECTION "serial", ROM0[$0058]
     ds $60 - @, 0 ; 7 nop
 
 SECTION "joypad", ROM0[$0060]
-    reti ; not necessary to fill with 0 (?)
+    reti
 
 SECTION "Header", ROM0[$0100]
 

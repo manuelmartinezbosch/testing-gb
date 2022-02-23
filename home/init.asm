@@ -1,9 +1,12 @@
 ; Game initialization
 ; 1. Disable interrupts and clear registers
 ; 2. Disable LCD display
-; .
-; ..
-; ...
+; 3. new sp to WRAM
+; 4. clear WRAM
+; 5. clear VRAM
+; 6. clear HRAM
+; 7. clear OAM Sprites
+; 8. prepare DMA transfer
 Init::
 
 ; * LCD enabled
@@ -14,11 +17,9 @@ Init::
 ; * 8x8 OBJ size
 ; * OBJ display enabled
 ; * BG display disabled    
-; example halt loop
 
 ;rLCDC_DEFAULT EQU %11000010
 
-; TODO apply after initialization
 rLCDC_DEFAULT EQU LCDCF_ON \
                 + LCDCF_WIN9C00 \
                 + LCDCF_WINOFF \
@@ -26,8 +27,9 @@ rLCDC_DEFAULT EQU LCDCF_ON \
                 + LCDCF_BG9800 \
                 + LCDCF_OBJ8 \
                 + LCDCF_OBJON \
-                + LCDCF_BGOFF
+                + LCDCF_BGON
 
+; 1. Disable interrupts and clear registers
     di
 
 	xor a
@@ -45,15 +47,48 @@ rLCDC_DEFAULT EQU LCDCF_ON \
 	ldh [rOBP0], a
 	ldh [rOBP1], a
 
+; 2. Disable LCD display
 	ld a, LCDCF_ON			; only LCD on, reset other bits
 	ldh [rLCDC], a
 	call DisableLCD
 
-; TODO clear VRAM, tiles DATA, BG Map...
-; TODO prepare DMA transfer in HRAM
-; TODO set rLCDC_DEFAULT
-
-; template infinite loop
+; 3. new stack pointer to WRAM
+	ld sp, wStack
+	
+; 4. clear WRAM
+	ld hl, WRAM0_Begin
+	ld bc, WRAM1_End - WRAM0_Begin
+	xor a
+	ld d, a
 .loop
-    halt
-    jr .loop
+	ld a, d
+    ld [hli], a
+    dec bc
+    ld a, b
+    or c
+    jr nz, .loop
+
+; 5. clear VRAM
+	ld hl, VRAM_Begin
+	ld bc, VRAM_End - VRAM_Begin
+	call FillMemory
+	
+; 6. clear HRAM
+	ld hl, HRAM_Begin
+	ld bc, HRAM_End - HRAM_Begin
+	call FillMemory
+
+; 7. clear OAM sprites
+	call ClearSprites
+
+; 8. prepare DMA transfer	
+	ld a, BANK(WriteDMACodeToHRAM)
+	ldh [hLoadedROMBank], a
+	ld [MBC1RomBank], a
+	call WriteDMACodeToHRAM
+
+; TODO clear rSTAT, hSCX, hSCY, rIF
+; TODO enable VBLANK interruption
+; TODO window layer off-screen
+; TODO clear BG Map...
+; TODO set rLCDC_DEFAULT (on-screen)
