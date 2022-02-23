@@ -1,5 +1,8 @@
+/bin
+
 *.o
 *.map
 *.sym
 *.gb
 *.gbc
+*.sav
