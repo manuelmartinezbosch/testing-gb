@@ -4,7 +4,7 @@
 ; 3. Disable LCD
 DisableLCD::
 	xor a
-	ldh [rIF], a
+	ldh [rIF], a			; to prevent interrupt occurred before backup rIE
 	ldh a, [rIE]
 	ld b, a                 ; backup rIE in b
 	res 0, a                ; disable vBlank interrupt
