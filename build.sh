@@ -18,15 +18,18 @@ ROM_TITLE=$2
 # BUILD generates object files from assambly code
 rgbasm -o bin/wram.o wram.asm
 rgbasm -o bin/home.o home.asm
+rgbasm -o bin/main.o main.asm
 
 # LINK the different object files
 rgblink -d                      `# DMG mode` \
-        -t                      `# tiny ROM (32 KB)` \
+        -p 0xff                 `# pad value between sections` \
         -m bin/${ROM_FILE_NAME}.map  `# map output file` \
         -n bin/${ROM_FILE_NAME}.sym  `# symbols output file (debugging purpose)` \
+        -l layout.link               `# sections layout file` \
         -o bin/${ROM_FILE_NAME}.gb   `# ROM output file` \
         bin/home.o              `# object files` \
-        bin/wram.o
+        bin/wram.o \
+        bin/main.o
 
 # FIX the ROM with different options, checksums and Nintendo Logo
 rgbfix -j                   `# non-japanese version` \
@@ -34,8 +37,9 @@ rgbfix -j                   `# non-japanese version` \
        -n 0                 `# game version number` \
        -k 11                `# new license code` \
        -l 0x33              `# old license code. Should be 0x33 when used new license code for SGB compatibility` \
-       -m 0                 `# MBC controller type` \
-       -r 0                 `# RAM size` \
+       -p 0xff              `# pad value for rom size alignement` \
+       -m 0x13              `# MBC controller type` \
+       -r 03                `# RAM size` \
        -t "${ROM_TITLE}"    `# ROM title` \
        bin/${ROM_FILE_NAME}.gb   `# ROM to fix` 
 

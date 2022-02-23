@@ -1,0 +1,45 @@
+ROM0
+	org $0000
+	"NULL"
+	org $0000
+	"rst0"
+	org $0008
+	"rst8"
+	org $0010
+	"rst10"
+	org $0018
+	"rst18"
+	org $0020
+	"rst20"
+	org $0028
+	"rst28"
+	org $0030
+	"rst30"
+	org $0038
+	"rst38"
+	org $0040
+	"vblank"
+	org $0048
+	"lcd"
+	org $0050
+	"timer"
+	org $0058
+	"serial"
+	org $0060
+	"joypad"
+	; $0061
+	"High Home"
+	org $100
+	"Header"
+	org $150
+	"Home"
+ROMX $1
+	"bank1"
+WRAM0
+	"OAM Buffer"
+	"WRAM"
+	org $df00
+	"Stack"
+HRAM
+	"OAM DMA"
+	"HRAM"
