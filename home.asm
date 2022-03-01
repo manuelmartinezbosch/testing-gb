@@ -13,6 +13,7 @@ INCLUDE "home/clear_sprites.asm"
 SECTION "Home", ROM0
 
 INCLUDE "home/start.asm"
+INCLUDE "home/vcopy.asm"
 INCLUDE "home/init.asm"
 INCLUDE "home/vblank.asm"
 

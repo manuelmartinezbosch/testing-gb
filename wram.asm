@@ -3,6 +3,9 @@ INCLUDE "constants.asm"
 INCLUDE "macros/wram.asm"
 
 
+INCLUDE "vram.asm"
+
+
 SECTION "OAM Buffer", WRAM0
 
 ; buffer for OAM data copied by DMA

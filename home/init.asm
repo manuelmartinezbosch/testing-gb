@@ -1,28 +1,35 @@
+; ----------------------------------------------------
 ; Game initialization
+; ----------------------------------------------------
 ; 1. Disable interrupts and clear registers
 ; 2. Disable LCD display
-; 3. new sp to WRAM
-; 4. clear WRAM
-; 5. clear VRAM
-; 6. clear HRAM
-; 7. clear OAM Sprites
-; 8. prepare DMA transfer
+; 3. New sp to WRAM
+; 4. Clear WRAM
+; 5. Clear VRAM
+; 6. Clear HRAM
+; 7. Clear OAM Sprites
+; 8. Prepare DMA transfer
+; 9. Reset registers for LCD
+; 10. Reset rIF and enable v-Blank interrupt
+; 11. Move the window off-screen
+; 12. Clear BG Maps with white space
+; 13. Disable audio
+; 14. Set rLCDC_DEFAULT (on-screen)
+; ---------------------------------------------------
 Init::
 
 ; * LCD enabled
 ; * Window tile map at $9C00
-; * Window display disabled
+; * Window display enabled
 ; * BG and window tile data at $8800
 ; * BG tile map at $9800
 ; * 8x8 OBJ size
 ; * OBJ display enabled
-; * BG display disabled    
-
-;rLCDC_DEFAULT EQU %11000010
+; * BG display enabled    
 
 rLCDC_DEFAULT EQU LCDCF_ON \
                 + LCDCF_WIN9C00 \
-                + LCDCF_WINOFF \
+                + LCDCF_WINON \
                 + LCDCF_BG8800 \
                 + LCDCF_BG9800 \
                 + LCDCF_OBJ8 \
@@ -48,7 +55,7 @@ rLCDC_DEFAULT EQU LCDCF_ON \
 	ldh [rOBP1], a
 
 ; 2. Disable LCD display
-	ld a, LCDCF_ON			; only LCD on, reset other bits
+	ld a, LCDCF_ON					; only LCD on, reset other bits
 	ldh [rLCDC], a
 	call DisableLCD
 
@@ -87,8 +94,45 @@ rLCDC_DEFAULT EQU LCDCF_ON \
 	ld [MBC1RomBank], a
 	call WriteDMACodeToHRAM
 
-; TODO clear rSTAT, hSCX, hSCY, rIF
-; TODO enable VBLANK interruption
-; TODO window layer off-screen
-; TODO clear BG Map...
-; TODO set rLCDC_DEFAULT (on-screen)
+; 9 reset registers for LCD
+	xor a
+	ldh [rSTAT], a
+	ldh [hSCX], a
+	ldh [hSCY], a
+	
+; 10. reset rIF and enable v-Blank interrupt	
+	ldh [rIF], a
+	ld a, IEF_VBLANK
+	ldh [rIE], a
+
+; 11. Move the window off-screen	
+	ld a, 144
+	ldh [hWY], a
+	ldh [rWY], a
+	ld a, 7
+	ldh [rWX], a
+
+; 12 clear BG Maps with white space
+	ld h, HIGH(vBGMap0)
+	call ClearBgMap
+	ld h, HIGH(vBGMap1)
+	call ClearBgMap
+
+
+; 13. disable audio
+	ld a, AUDENA_OFF
+	ldh [rAUDENA], a
+
+; 14. set rLCDC_DEFAULT (on-screen)
+
+	ld a, rLCDC_DEFAULT
+	ldh [rLCDC], a
+
+	ei
+; example halt loop	
+.haltLoop
+	halt
+	nop 
+	nop
+	nop
+	jr .haltLoop
